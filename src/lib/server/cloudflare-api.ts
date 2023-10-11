@@ -3,7 +3,6 @@ import { env } from "$env/dynamic/private";
 const BASE_URL = 'https://api.cloudflare.com/client/v4';
 const getBaseURL = (v: 1 | 2) => `${BASE_URL}/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/images/v${v}`;
 const request = async (url: string, options: RequestInit) => {
-    console.log(url, options)
     const response = await fetch(url, {
         ...options,
         headers: {
@@ -29,9 +28,14 @@ export const cloudflareImages = {
     },
     delete: async (id: string) => {
         return request(`${getBaseURL(1)}/${id}`, { method: 'DELETE' });
-    }
+    },
+    setAccountConfig: async (config: Partial<AccountConfig>) => {
+        return request(`${getBaseURL(1)}/config`, { method: 'PATCH', body: JSON.stringify(config) });
+    },
+    getAccountConfig: async () => {
+        return request(`${getBaseURL(1)}/config`, { method: 'GET' }).then((response) => response.result as AccountConfig);
+    },
 }
-
 type Image = {
     id: string;
     filename: string;
@@ -39,4 +43,8 @@ type Image = {
     uploaded: string;
     requireSignedURLs: boolean;
     variants: string[];
-}
+};
+
+type AccountConfig = {
+    browser_ttl: number;
+};

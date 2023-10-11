@@ -5,6 +5,7 @@ export const load: PageServerLoad = async () => {
     return {
         streamed: {
             images: cloudflareImages.list(),
+            accountConfig: cloudflareImages.getAccountConfig(),
         }
     }
 }
@@ -21,5 +22,9 @@ export const actions: Actions = {
     delete: async ({ request }) => {
         const id = await request.formData().then((formData) => formData.get('id') as string);
         await cloudflareImages.delete(id);
+    },
+    setAccountTTL: async ({ request }) => {
+        const ttl = await request.formData().then((formData) => formData.get('ttl') as string);
+        await cloudflareImages.setAccountConfig({browser_ttl: parseInt(ttl)});
     },
 }

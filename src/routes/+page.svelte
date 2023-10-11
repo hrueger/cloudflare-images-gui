@@ -5,7 +5,8 @@
     let showUploadModal = false;
 </script>
 
-<div class="container mt-4">
+<details class="container mt-4" open>
+    <summary>Images</summary>
     {#await data.streamed.images}
         <div class="d-flex justify-content-center mt-5 pt-5">
             <div class="spinner-border" role="status">
@@ -47,7 +48,30 @@
     {:catch error}
         <pre>{JSON.stringify(error, null, 2)}</pre>
     {/await}
-</div>
+</details>
+
+<details class="container mt-4">
+    <summary>Settings</summary>
+    {#await data.streamed.accountConfig}
+        Loading...
+    {:then accountConfig}
+        Current TTL: {accountConfig.browser_ttl} seconds ({Math.round(accountConfig.browser_ttl / 60 / 60 / 24)} days)
+    {:catch error}
+        <pre>{JSON.stringify(error, null, 2)}</pre>
+    {/await}
+    <form method="POST" action="?/setAccountTTL">
+        <select name="ttl" class="form-select">
+            <option value="31536000">1 year</option>
+            <option value="15768000">6 months</option>
+            <option value="7884000">3 months</option>
+            <option value="2592000">1 month</option>
+            <option value="604800">1 week</option>
+            <option value="172800">2 days</option>
+            <option value="86400">1 day</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Set account TTL</button>
+    </form>
+</details>
 
 <div class="modal fade" class:show={showUploadModal} class:d-block={showUploadModal} id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
